@@ -85,7 +85,7 @@ public class GenericRateLimiter implements RateLimiter {
 
     /**
      * Acquire one permission.
-     * Default : 500 ms
+     *
      * @return {@code true}-When permitted, {@code false} when not permitted.
      */
     @Override
