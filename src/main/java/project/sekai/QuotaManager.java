@@ -83,11 +83,12 @@ public class QuotaManager<T> {
 
         long l = Repository.getAndUpdate(cur -> cur > 0 ? cur - 1 : cur);
         if (l > 0) {
-            ExpirationLedger.put(relativeData, Scheduler.schedule(() -> {
-                Repository.incrementAndGet();
-                EXPIRE_BEHAVIOR.accept(relativeData);
-                ExpirationLedger.remove(relativeData);
-            }, EXPIRE_TIME, TimeUnit.MILLISECONDS));
+            if (relativeData != null)
+                ExpirationLedger.put(relativeData, Scheduler.schedule(() -> {
+                    Repository.incrementAndGet();
+                    EXPIRE_BEHAVIOR.accept(relativeData);
+                    ExpirationLedger.remove(relativeData);
+                }, EXPIRE_TIME, TimeUnit.MILLISECONDS));
             return Optional.of(l);
         } else
             return Optional.empty();
