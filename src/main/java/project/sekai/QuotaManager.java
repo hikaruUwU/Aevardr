@@ -102,7 +102,9 @@ public class QuotaManager<T> {
      * {@code False} - failed, your quota may have been cancelled once before / service is shutting down.
      */
     public boolean cancelled(T t) {
-        if (!DESTROY_PHASE && ExpirationLedger.remove(t) != null) {
+        ScheduledFuture<?> remove = ExpirationLedger.remove(t);
+        if (!DESTROY_PHASE && remove != null) {
+            remove.cancel(false);
             Repository.incrementAndGet();
             return true;
         } else
@@ -117,7 +119,12 @@ public class QuotaManager<T> {
      * {@code False} - failed, your quota may have been confirmed before / service is shutting down.
      */
     public boolean confirmed(T t) {
-        return !DESTROY_PHASE && ExpirationLedger.remove(t) != null;
+        ScheduledFuture<?> remove = ExpirationLedger.remove(t);
+        if (!DESTROY_PHASE && remove != null) {
+            remove.cancel(false);
+            return true;
+        } else
+            return false;
     }
 
     /**
